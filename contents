@@ -1,0 +1,4 @@
+grab_tweets = grabs the tweets with #metoo 
+metoo.json = raw tweet feed
+parse.py = reads the metoo.json file and take the relevant data to a csv. 
+intersting.csv = contains the usable data which we'll use to create data visualisations. 
