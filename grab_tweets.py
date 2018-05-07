@@ -2,9 +2,9 @@ from tweepy import Stream
 from tweepy.streaming import StreamListener
 from auth import get_auth
 
-keyword_list=['metoo']
+keyword_list=['#loveboth', '#SaveThe8th', "#JoinTheRebellion"]
 limit = 1000
-filename = "20180216_MeToo"
+filename = "repealNo.json"
 
 class MyStreamListener(StreamListener):
 

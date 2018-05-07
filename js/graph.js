@@ -1,5 +1,5 @@
 queue()
-  .defer(d3.csv, "data/interesting.csv")
+  .defer(d3.csv, "data/interestingRepeal.csv")
   .await(makeGraphs);
   
   
@@ -11,46 +11,51 @@ queue()
           d.polarity = parseInt(d.polarity);
           d.subjectivity = parseInt(d.subjectivity); 
           d.created_at = parseInt(d.created_at);
-      })
+      });
+    
+      average_scores(ndx, "#average_hdi_score");
       
-      show_all_sentiment(ndx)
-  }  
+       dc.renderAll();
+    }
     
-
-function show_all_sentiment(ndx) {
-    var  sentimentColors = d3.scale.ordinal()
-    .domain(["Polarity", "Subjectvity"])
-    .range(["green", "red"]);
+    function average_scores(ndx, element) {
+  
+    let all_records = ndx.groupAll();
     
+    let average_polarity = all_records.reduce(
+        function (p, v) {
+            p.count++;
+            p.total += v.polarity;
+            p.average = p.total / p.count;
+            return p;
+        },
+        function (p, v) {
+            p.count--;
+            if(p.count > 0){
+                p.total -= v.polarity;
+                p.average = p.total / p.count; 
+            }else{
+                p.total = 0;
+                p.average = 0
+            }
+            return p;
+        },
+        function (){
+            return {count:0, total:0, average:0}
+        });
+        
     
-    let eDim = ndx.dimension(dc.pluck("created_at"));
-    let sentimentDim = ndx.dimension(function(d){
-        return [d.polarity, d.subjectivity, d.created_at];
-    });
-    
-    let postedDate = sentimentDim.group();
-    
-    let minSentiment = eDim.bottom(-)[0].yrs_service;
-    let maxExperience = eDim.top(1)[0].yrs_service;
-    
-   dc.scatterPlot("#Salary-to-years-of-service")
-        .width(800)
-        .height(400)
-        .x(d3.scale.linear().domain([minExperience,maxExperience]))
-        .brushOn(true)
-        .symbolSize(8)
-        .clipPadding(10)
-        .yAxisLabel("Salary")
-        .xAxisLabel("yrs_service")
-        .title(function (d) {
-            return d.key[2] + " earned " + d.key[1];
+    dc.numberDisplay(element)
+        .formatNumber(d3.format(".1f"))
+        .valueAccessor(function (d) {
+            return d.average;
+            print(d.average)
         })
-        .colorAccessor(function (d) {
-            return d.key[3];
-        })
-        .colors(genderColors)
-        .dimension(experienceDim)
-        .group(experienceSalaryGroup)
-        .margins({top: 10, right: 50, bottom: 75, left: 75});
+        .group(average_scores);
         
 }
+
+    
+    
+  
+  
